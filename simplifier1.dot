@@ -1,0 +1,7 @@
+digraph NFA {
+    node0[label="node0"];
+    node1[label="node1"];
+    node0 -> node0[label="b"];
+    node0 -> node0[label="c"];
+    node1 -> node0[label="a"];
+}

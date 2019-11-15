@@ -1,0 +1,7 @@
+S -> aB
+S -> ε
+B -> aB
+B -> bD
+D -> cE
+E -> aE
+E -> ε
