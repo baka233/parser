@@ -151,7 +151,22 @@ impl<'a> Iterator for FormalLanguageIterator<'a> {
             return Some((tmpid, to, Token::Character(first)));
         } else {
             self.pos = Some(self.pos.unwrap() + 1);
-            if first == 'ε' {
+            if is_identifier(first) {
+                let token = Token::Identifier(first);
+                if let None = self.visited.get(&token) {
+                    self.visited.insert(token.clone());
+                    self.queue.push_back(token.clone());
+                }
+                let to = match self.token_map.get(&token) {
+                    Some(t) => *t,
+                    None => {
+                        self.num += 1;
+                        self.token_map.insert(token, self.num);
+                        self.num
+                    }
+                };
+                return Some((tmpid, to, Token::Epsilon));
+            } else if first == 'ε' {
                 return Some((tmpid, self.end, Token::Epsilon));
             } else {
                 return Some((tmpid, self.end, Token::Character(first)));
@@ -160,6 +175,12 @@ impl<'a> Iterator for FormalLanguageIterator<'a> {
     }
 }
 
+fn is_identifier(ch : char) -> bool {
+    match ch {
+        'A'..='Z' =>  true,
+        _ => false,
+    }
+}
 
 
 #[test]
@@ -183,7 +204,13 @@ fn test_dfa() {
     formal.print();
     let nfa = formal.get_nfa();
     let mut dfa = DFA::from_nfa(&nfa);
+    dfa.print();
     dfa.simplifier();
     dfa.print();
+    use std::fs::File;
+    let mut output = File::create("example2.dot").unwrap();
+    dot::render(&dfa, &mut output).unwrap();
     println!("match pattern to {} is {}", "aaaabcaab", dfa.scanner("aaaabcaab"));
+    println!("match pattern to {} is {}", "aaabbcaaaaaab", dfa.scanner("aaabbcaaaaaab"));
+
 }

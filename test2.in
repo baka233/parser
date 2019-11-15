@@ -1,4 +1,4 @@
-S -> aB
+S -> B
 S -> ε
 B -> aB
 B -> bD

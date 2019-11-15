@@ -98,7 +98,18 @@ impl DFA {
         let mut ans = String::new();
         let mut max_ans = String::new();
         let mut id = self.start;
-        for ch in string.chars() {
+        let mut iter = string.chars();
+        let mut ch = 'a';
+        let mut pos_flag = true;
+        loop {
+            if pos_flag {
+                match iter.next() {
+                    Some(c) => ch = c,
+                    None => break,
+                }
+            } else {
+                pos_flag = !pos_flag;
+            }
             let token = Token::Character(ch);    
             let mut flag = false;
             if self.nodes.get(&id).unwrap().nodetype == DFANodeType::Terminal {
@@ -111,6 +122,7 @@ impl DFA {
                 .edges
                 .iter() 
             {
+                //println!("edge is {:?} {}, current is {:?}", test_token, to, token);
                 if *test_token == token {
                     id = *to;
                     flag = true;
@@ -119,9 +131,12 @@ impl DFA {
             }
 
             if !flag {
+                pos_flag = !pos_flag;
+                //println!("has been cleared, {}", pos_flag);
                 id = self.start;
                 ans.clear();
             } else {
+                //println!("{} to {}", ch, ans);
                 ans.push(ch);
             }
         }
